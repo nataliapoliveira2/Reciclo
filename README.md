@@ -1,33 +1,38 @@
-# Reciclo
+# Reciclo - Wireframe
 
-Solução de educação ambiental e descarte correto de resíduos com apoio de tecnologias digitais e imersivas.
+This template should help get you started developing with Vue 3 in Vite.
 
-O Reciclo é um projeto de educação ambiental voltado à conscientização sobre os tipos, classificação e descarte correto de resíduos, com aplicação inicial no IFB Campus Brasília e foco principal nos estudantes do ensino médio.
+## Recommended IDE Setup
 
-## Baixando projeto
+[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-Para baixar o projeto em sua máquina, basta selecionar no ```.code``` e utilizar o formato que preferir para baixar o repositório ou utilizar o git da seguinte forma:
+## Recommended Browser Setup
 
-```bash
-git clone https://gitlab.com/reciclo/reciclo.git
-cd reciclo
-code .
+- Chromium-based browsers (Chrome, Edge, Brave, etc.):
+  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
+  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
+- Firefox:
+  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
+  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+
+## Customize configuration
+
+See [Vite Configuration Reference](https://vite.dev/config/).
+
+## Project Setup
+
+```sh
+npm install
 ```
 
-## Colaboradores
+### Compile and Hot-Reload for Development
 
-* [Professora Simone Pinheiros](https://docs.gitlab.com/user/project/merge_requests/auto_merge/) | Product Owner
-* [Maria Clara Barroso de Carvalho](https://linkedin.com/in/mariaclarab) | Desenvolvedora
-* [Daniela Almeida](https://gitlab.com/danie-la-if/) | Desenvolvedora e Negociadora
-* [Natália Oliveira](https://linkedin.com/in/nataliapdo) | Desenvolvedora e Suporte
-* [Vínicius Henrique](https://docs.gitlab.com/user/project/merge_requests/approvals/) | Desenvolvedor e Design
+```sh
+npm run dev
+```
 
+### Compile and Minify for Production
 
-## Imagens
-![Mockup](./img/mockup.jpg)
-
-## Licença
-Projeto open source ainda estamos definindo uma licença.
-
-## Status do projeto :construction:
-Versão 1.0.0
+```sh
+npm run build
+```
