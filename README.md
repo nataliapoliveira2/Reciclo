@@ -1,6 +1,8 @@
 # Reciclo
 
-Solução de educação ambiental focada na destinação correta e outros processos de resíduos sólidos e urbano. Atrelado ao programa LixoZero no IFB.
+Solução de educação ambiental e descarte correto de resíduos com apoio de tecnologias digitais e imersivas.
+
+O Reciclo é um projeto de educação ambiental voltado à conscientização sobre os tipos, classificação e descarte correto de resíduos, com aplicação inicial no IFB Campus Brasília e foco principal nos estudantes do ensino médio.
 
 ## Baixando projeto
 
@@ -11,15 +13,6 @@ git clone https://gitlab.com/reciclo/reciclo.git
 cd reciclo
 code .
 ```
-
-## Ferramentas utilizadas no projeto
-* JavaScript
-* HTML e CSS
-* RV&RA
-* Git
-* Gitlab
-
-
 
 ## Colaboradores
 
