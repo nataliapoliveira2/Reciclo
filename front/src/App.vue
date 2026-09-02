@@ -1,402 +1,713 @@
 <template>
-  <div class="page-wrapper">
-    <div class="mobile-frame">
-      <main class="app-background">
-        <header class="app-header">
-          <h1>Reciclo</h1>
-          <h3>Realidade Aumentada</h3>
+  <div class="page-container">
+    <main class="background-premium">
+
+      <div class="content-wrapper">
+
+        <!-- Header -->
+        <header class="top-nav">
+          <div class="logo-area">
+            <img src="/LogoIFB.png" alt="Logo IFB" class="logo-img" />
+            <div class="logo-divider"></div>
+            <img src="/LogoILZB.png" alt="Logo Lixo Zero" class="logo-img" />
+          </div>
+
+          <div class="admin-menu-wrapper">
+            <button class="menu-btn" @click="menuAberto = !menuAberto">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffffff" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+
+            <transition name="fade">
+              <div v-if="menuAberto" class="admin-dropdown">
+                <a href="#login" class="dropdown-item" @click="menuAberto = false">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#258599" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                    <polyline points="10 17 15 12 10 7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
+                  </svg>
+                  <span>Login</span>
+                </a>
+              </div>
+            </transition>
+          </div>
         </header>
 
-        <div class="card-translucido">
-          <p>
-            O <strong>Reciclo</strong> é uma iniciativa integrada ao projeto <strong>Lixo Zero</strong> do IFB,
-            desenvolvida para facilitar o descarte correto de resíduos por meio da Realidade Aumentada.
-            Ao apontar a câmera para embalagens e materiais, a aplicação identifica o resíduo em tempo real
-            e orienta a separação correta, apoiando a sustentabilidade e a preservação do nosso campus.
-          </p>
+        <div class="page-titles">
+          <h1>Portal de Notícias <strong>RECICLO</strong></h1>
+          <p>Acompanhe as atualizações sustentáveis do Campus Brasília</p>
         </div>
 
-        <h2 class="subtitulo-h2">Mecânica Principal</h2>
-
-        <div class="card-translucido card-mecanica">
-          <div class="card-header">
-            <div class="icone-box">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#123e47" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 7V5a2 2 0 0 1 2-2h2" />
-                <path d="M17 3h2a2 2 0 0 1 2 2v2" />
-                <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
-                <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
-                <rect x="7" y="7" width="10" height="10" rx="2" />
-              </svg>
-            </div>
-            <h4 class="card-titulo">
-              1. Scan &amp; Spawn
-            </h4>
+        <!-- Carrosel de Notícias  -->
+        <section class="glass-card hero-card">
+          <div class="hero-image-container">
+            <img :src="noticiasDestaque[slideAtivo]?.imagem" alt="Notícia Destaque" class="hero-image" />
           </div>
 
-          <p class="card-texto">
-            Ao escanear o objeto com a câmera, a tecnologia de Realidade Aumentada identifica o tipo de resíduo
-            instantaneamente e projeta a lixeira ideal para a separação adequada.
-          </p>
+          <div class="hero-content">
+            <div class="hero-header-info">
+              <span class="tag-highlight">DESTAQUE</span>
+              <span class="date-text">{{ formatarData(noticiasDestaque[slideAtivo]?.data) }}</span>
+            </div>
+
+            <h2>{{ noticiasDestaque[slideAtivo]?.titulo }}</h2>
+            <p>{{ noticiasDestaque[slideAtivo]?.resumo }}</p>
+
+            <button @click="abrirNoticia(noticiasDestaque[slideAtivo])" class="btn-ler-materia">
+              Ler Matéria Completa
+            </button>
+
+            <div class="carousel-controls">
+              <button @click="slideAnterior" class="circle-btn">❮</button>
+
+              <div class="carousel-indicators">
+                <span v-for="(noticia, index) in noticiasDestaque" :key="noticia.id" class="indicator-dot"
+                  :class="{ active: slideAtivo === index }" @click="slideAtivo = index"></span>
+              </div>
+
+              <button @click="proximoSlide" class="circle-btn">❯</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="section-divider">
+          <h3>Últimas Atualizações</h3>
+          <div class="yellow-line"></div>
         </div>
 
-        <div class="card-translucido card-mecanica">
-          <div class="card-header">
-            <div class="icone-box">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#123e47" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                <line x1="10" y1="11" x2="10" y2="17" />
-                <line x1="14" y1="11" x2="14" y2="17" />
-              </svg>
+        <!-- Grade de Notícias -->
+        <section class="news-grid">
+          <article v-for="noticia in noticiasOrdenadas" :key="noticia.id" class="glass-card mini-card clickable"
+            @click="abrirNoticia(noticia)">
+            <div class="mini-card-img-wrapper">
+              <img :src="noticia.imagem" alt="Capa da Notícia" class="mini-card-img" />
             </div>
-            <h4 class="card-titulo">
-              2. Indicação da Lixeira
-            </h4>
+
+            <div class="mini-card-content">
+              <span class="date-text small-date">{{ formatarData(noticia.data) }}</span>
+              <h4 class="mini-card-title">{{ noticia.titulo }}</h4>
+              <p class="mini-card-summary">{{ noticia.resumo }}</p>
+            </div>
+          </article>
+        </section>
+
+        <transition name="fade">
+          <div v-if="noticiaAberta" class="modal-overlay" @click.self="fecharNoticia">
+            <article class="glass-card modal-content">
+              <button class="modal-close-btn" @click="fecharNoticia">✕</button>
+
+              <span class="date-text">{{ formatarData(noticiaAberta.data) }}</span>
+              <h2 class="modal-title">{{ noticiaAberta.titulo }}</h2>
+
+              <div class="modal-img-container">
+                <img :src="noticiaAberta.imagem" :alt="noticiaAberta.titulo" />
+              </div>
+
+              <div class="modal-body">
+                <p class="modal-resumo">{{ noticiaAberta.resumo }}</p>
+                <p class="modal-texto">{{ noticiaAberta.conteudo }}</p>
+              </div>
+            </article>
           </div>
+        </transition>
 
-          <p class="card-texto">
-            A tela projeta a lixeira correspondente em Realidade Aumentada com base na cor padrão da coleta seletiva
-            (papel, plástico, vidro, metal ou não reciclável).
-          </p>
-        </div>
-
-        <div class="card-translucido card-mecanica">
-          <div class="card-header">
-            <div class="icone-box">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#123e47" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-            </div>
-            <h4 class="card-titulo">
-              3. Pontos de Coleta (Ecopontos)
-            </h4>
-          </div>
-
-          <p class="card-texto">
-            Para resíduos que não vão na coleta seletiva comum como pilhas, lâmpadas e eletrônicos,
-            o aplicativo aponta o ecoponto ou lixeira especial mais próxima no campus.
-          </p>
-        </div>
-
-        <div class="card-translucido card-mecanica">
-          <div class="card-header">
-            <div class="icone-box">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#123e47" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-            </div>
-            <h4 class="card-titulo">
-              4. Confirmação do Descarte
-            </h4>
-          </div>
-
-          <p class="card-texto">
-            O estudante confirma a ação ao jogar o resíduo no local correto,
-            registrando a destinação adequada do material.
-          </p>
-        </div>
-
-        <h2 class="subtitulo-h2">Tipos de Resíduos</h2>
-
-        <div class="card-translucido card-residuos">
-          <!-- 1. Papel -->
-          <div class="item-residuo">
-            <div class="bolinha-cor bg-papel"></div>
-            <div class="info-residuo">
-              <h5>Papel</h5>
-              <span>Folhas, jornais e revistas sem sujeira</span>
-            </div>
-          </div>
-
-          <!-- 2. Reciclável Seco -->
-          <div class="item-residuo">
-            <div class="bolinha-cor bg-reciclavel-seco"></div>
-            <div class="info-residuo">
-              <h5>Reciclável (Seco)</h5>
-              <span>Embalagens, latas, plástico e garrafas</span>
-            </div>
-          </div>
-
-          <div class="item-residuo item-destaque-organico">
-            <div class="bolinha-cor bg-organico bolinha-estrela">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="#ffdf00">
-                <path
-                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-            </div>
-            <div class="info-residuo">
-              <span class="tag-destaque">Foco Lixo Zero / Compostagem</span>
-              <h5>Orgânico / Úmido</h5>
-              <span>Restos de comida e papel engordurado</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="cta-container">
-          <button class="btn-download">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#257280" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <rect x="5" y="2" width="14" height="20" rx="3" ry="3" />
-              <line x1="12" y1="18" x2="12.01" y2="18" />
-            </svg>
-            <span>Baixar Reciclo</span>
-          </button>
-
-          <span class="disponibilidade-texto">Disponível para iOS e Android</span>
-        </div>
-
-      </main>
-    </div>
+      </div>
+    </main>
   </div>
 </template>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+<script setup>
+import { ref, computed } from 'vue'
 
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+const menuAberto = ref(false)
+const slideAtivo = ref(0)
+const noticiaAberta = ref(null)
+
+const abrirNoticia = (item) => {
+  noticiaAberta.value = item
+  document.body.style.overflow = 'hidden'
 }
 
-body {
-  background-color: #258599;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+const fecharNoticia = () => {
+  noticiaAberta.value = null
+  document.body.style.overflow = 'auto'
+}
+
+const noticias = ref([
+  {
+    id: 1,
+    titulo: 'IFB Campus Brasília recebe destaque no Prêmio Lixo Zero 2025',
+    resumo: 'O evento celebrou iniciativas de impacto que promovem a redução de resíduos, a economia circular e a sustentabilidade em diferentes setores.',
+    conteudo: `Entre os premiados da noite, a professora Simone Pinheiro, do IFB Campus Brasília, recebeu o reconhecimento na categoria Educadora Lixo Zero, em homenagem ao trabalho que vem desenvolvendo na implantação da metodologia Lixo Zero no campus. A homenagem destaca o papel central da docente na transformação da gestão de resíduos da unidade, por meio de programa contínuo de extensão.
+
+              Atualmente, o IFB Campus Brasília é referência interna: é o único campus do IFB que composta 80% dos resíduos orgânicos gerados e realiza o encaminhamento dos recicláveis para a cooperativa Vencendo Obstáculos, fortalecendo o trabalho de catadores e promovendo a inclusão socioambiental. A iniciativa reduziu o envio de resíduos ao aterro sanitário, fortaleceu práticas de consumo consciente e mobilizou estudantes, servidores e terceirizados em torno do conceito Lixo Zero.
+
+            O prêmio também reconheceu diversas outras ações e inovações voltadas para sustentabilidade, gestão de resíduos, tecnologia social e mobilização comunitária — reforçando a importância de instituições públicas como o IFB no avanço das práticas ambientais no Distrito Federal.
+
+            Para a professora Simone, "Este prêmio é um reflexo da persistência. Tudo que é novo é diferente exige muita persistência. Precisamos alfabetizar ambientalmente as pessoas para a mudança".`,
+    data: '2025-12-05',
+    imagem: '/ImgNoticia1.jpg'
+  },
+
+  {
+    id: 2,
+    titulo: 'IFB recebe Encontro Nacional de Boas Práticas Lixo Zero nesta semana',
+    resumo: 'O Campus Brasília do Instituto Federal de Brasília (IFB) sediou nesta quarta-feira (3) e segue sediando até amanhã (4) o Encontro Nacional de Boas Práticas Lixo Zero, evento que reúne iniciativas, projetos e tecnologias de destaque na área de gestão de resíduos, sustentabilidade e economia circular.',
+    conteudo: `A programação reúne empresas, instituições de ensino, organizações sociais, gestores públicos e pessoas que têm desenvolvido soluções inovadoras para redução, reutilização e transformação de resíduos. O objetivo é promover um espaço de troca, formação e inspiração para todos que desejam contribuir com práticas sustentáveis em seus territórios.
+
+              O encontro é fruto da parceria entre o Instituto Lixo Zero Brasil (ILZB), o Instituto Desponta Brasil, o Instituto Federal de Brasília (IFB) e o Serviço de Limpeza Urbana (SLU). Juntas, as instituições uniram esforços para fortalecer a cultura do Lixo Zero no Distrito Federal, ampliando o diálogo sobre educação ambiental, inovação social e práticas que podem ser aplicadas tanto no cotidiano quanto em políticas públicas.
+
+              Durante os dois dias, o público tem acesso a palestras, apresentação de cases, oficinas temáticas e exposição de projetos voltados à reciclagem, compostagem, reaproveitamento de materiais, design sustentável e tecnologias de impacto. A iniciativa destaca-se por reunir experiências de várias regiões do país, permitindo o intercâmbio de práticas e metodologias que vêm transformando a gestão de resíduos no Brasil.
+
+              O evento é gratuito e aberto à comunidade. Interessados ainda podem se inscrever para participar das atividades desta quinta-feira (4). Para isso, basta acessar o formulário disponível em https://forms.gle/KKmBJ8JUVEWbGYjj8 e comparecer ao IFB Campus Brasília.`,
+    data: '2025-12-03',
+    imagem: '/ImgNoticia2.jpeg'
+  },
+
+  {
+    id: 3,
+    titulo: 'Campus Brasília avança rumo ao lixo zero e seleciona cooperativas para coleta de recicláveis',
+    resumo: 'A nova aplicação do projeto Lixo Zero reconhece resíduos em tempo real pela câmera e ensina o descarte correto de forma interativa.',
+    conteudo: `O IFB Campus Brasília informa que estão abertas as inscrições para o Encontro Nacional de Boas Práticas Lixo Zero, que será realizado nos dias 3 e 4 de dezembro, das 9h às 17h, no Auditório do Bloco C do IFB Campus Brasília, Asa Norte.
+
+              Trata-se de um encontro de soluções, iniciativas e experiências que estão transformando o Brasil rumo ao Lixo Zero.
+
+              Acontecerão também oficinas com o Patubatê, de madeira plástica e outras.
+
+              Haverá certificação.
+
+              Link de inscrição: https://forms.gle/KKmBJ8JUVEWbGYjj8`,
+    data: '2025-06-06',
+    imagem: '/ImgNoticia3.jpeg'
+  },
+
+  {
+    id: 4,
+    titulo: 'Coleta de resíduos eletrônicos no IFB Campus Brasília',
+    resumo: 'O IFB Campus Brasília, nessa quarta-feira (31/07), realizou a retirada dos resíduos eletrônicos coletados até o momento. A ação faz parte do Programa de Ponto de Entrega Voluntária (PEV), que visa promover o descarte correto de materiais e contribuir para a preservação do meio ambiente.',
+    conteudo: 'A ação arrecadou centenas de quilos de lixo eletrônico (e-lixo), incluindo teclados antigos, monitores, cabos e baterias. Todos esses materiais contêm metais pesados e precisam de destinação específica para não contaminar o solo. A coleta será realizada semestralmente, e a comunidade externa também está convidada a participar das próximas edições.',
+    data: '2024-08-01',
+    imagem: '/ImgNoticia4.jpg'
+  },
+  {
+    id: 5,
+    titulo: 'Encontro Nacional de Boas Práticas Lixo Zero começa dia 3',
+    resumo: 'O IFB Campus Brasília informa que estão abertas as inscrições para o Encontro Nacional de Boas Práticas Lixo Zero, que será realizado nos dias 3 e 4 de dezembro, das 9h às 17h, no Auditório do Bloco C do IFB Campus Brasília, Asa Norte.',
+    conteudo: `Trata-se de um encontro de soluções, iniciativas e experiências que estão transformando o Brasil rumo ao Lixo Zero.
+
+              Acontecerão também oficinas com o Patubatê, de madeira plástica e outras.
+
+              Haverá certificação.
+
+              Link de inscrição: https://forms.gle/KKmBJ8JUVEWbGYjj8`,
+    imagem: '/ImgNoticia5.png'
+  },
+])
+
+const noticiasOrdenadas = computed(() => {
+  return [...noticias.value].sort((a, b) => new Date(b.data) - new Date(a.data))
+})
+
+const noticiasDestaque = computed(() => {
+  return noticiasOrdenadas.value.slice(0, 3)
+})
+
+const proximoSlide = () => {
+  if (noticiasDestaque.value.length === 0) return
+  slideAtivo.value = (slideAtivo.value + 1) % noticiasDestaque.value.length
+}
+
+const slideAnterior = () => {
+  if (noticiasDestaque.value.length === 0) return
+  slideAtivo.value = (slideAtivo.value - 1 + noticiasDestaque.value.length) % noticiasDestaque.value.length
+}
+
+const formatarData = (dataIso) => {
+  if (!dataIso) return ''
+  const [ano, mes, dia] = dataIso.split('-')
+  return `${dia}/${mes}/${ano}`
+}
+</script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
 }
 </style>
 
 <style scoped>
-.page-wrapper,
-.mobile-frame {
-  width: 100% !important;
-  min-height: 100vh !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  overflow: visible !important;
-  display: flex;
-  flex-direction: column;
-}
-
-.app-background {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
+* {
   box-sizing: border-box;
-  padding: 48px 20px 30px 20px;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='rgba(255, 255, 255, 0.08)' stroke-width='1'%3E%3Crect width='40' height='40'/%3E%3Ccircle cx='20' cy='20' r='14'/%3E%3Cpath d='M20 0 L40 20 L20 40 L0 20 Z'/%3E%3C/g%3E%3C/svg%3E"),
-    linear-gradient(180deg,
-      #258599 0%,
-      #31959b 30%,
-      #55ad98 85%,
-      #86c596 100%);
-
-  background-repeat: repeat, no-repeat;
-  background-size: 34px 34px, 100% 100%;
-  background-attachment: local, local;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.app-background::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
+.page-container {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-h1,
-h3 {
-  text-align: center;
-  color: #ffffff;
+.background-premium {
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 30px 20px 80px 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='rgba(255, 255, 255, 0.08)' stroke-width='1'%3E%3Crect width='40' height='40'/%3E%3Ccircle cx='20' cy='20' r='14'/%3E%3Cpath d='M20 0 L40 20 L20 40 L0 20 Z'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(180deg, #258599 0%, #31959b 30%, #55ad98 85%, #86c596 100%);
+  background-attachment: fixed;
+  background-size: cover;
 }
 
-h3 {
-  font-weight: 400;
-}
-
-.card-translucido {
-  background-color: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 18px 20px;
-  margin-top: 28px;
-}
-
-.card-translucido p {
-  color: #123e47;
-  font-size: 13.5px;
-  line-height: 1.45;
-  font-weight: 500;
-  text-align: left;
-  text-align: justify;
-}
-
-.card-translucido strong {
-  font-weight: 700;
-}
-
-.subtitulo-h2 {
-  margin-top: 28px;
-  justify-content: center;
-  text-align: center;
-  color: #ffffff;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.icone-box {
-  width: 36px;
-  height: 36px;
-  background-color: rgba(255, 255, 255, 0.25);
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.card-titulo {
-  color: #123e47;
-  font-size: 18px;
-  line-height: 1.45;
-  font-weight: 700;
-  text-align: left;
-}
-
-.card-residuos {
+.content-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px;
 }
 
-.item-residuo {
+.top-nav {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 14px;
-  background-color: rgba(255, 255, 255, 0.22);
-  padding: 12px 16px;
-  border-radius: 14px;
-}
-
-.bolinha-cor {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  min-height: 22px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.info-residuo {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  text-align: left;
-}
-
-.info-residuo h5 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #123e47;
-  line-height: 1.2;
-}
-
-.info-residuo span {
-  font-size: 12px;
-  font-weight: 500;
-  color: #234d56;
-  margin-top: 3px;
-  line-height: 1.3;
-}
-
-.bg-papel {
-  background-color: #0b4f9c;
-}
-
-.bg-reciclavel-seco {
-  background-color: #c92a2a;
-}
-
-.bg-organico {
-  background-color: #4a2c20;
-}
-
-.bolinha-estrela {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  margin-bottom: 40px;
   position: relative;
 }
 
-.bolinha-estrela svg {
-  display: block;
-  margin: auto;
-  transform: translateY(-0.5px); 
-}
-
-.cta-container {
+.logo-area {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  margin-top: 50px;
-  margin-bottom: 20px;
-  width: 100%;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px 24px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.btn-download {
+.logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-divider {
+  width: 1.5px;
+  height: 26px;
+  background-color: rgba(255, 255, 255, 0.4);
+  margin: 0 4px;
+}
+
+.admin-menu-wrapper {
+  position: relative;
+}
+
+.menu-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.menu-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.admin-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: #fff;
+  padding: 6px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  z-index: 100;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
   gap: 10px;
-  width: 100%;
-  padding: 14px 20px;
-  background-color: #ffffff;
-  border: none;
-  border-radius: 9999px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.btn-download:active {
-  transform: scale(0.98);
-}
-
-.btn-download span {
-  color: #257280;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.disponibilidade-texto {
-  margin-top: 25px;
-  font-size: 11px;
+  padding: 10px 14px;
+  text-decoration: none;
+  color: #123e47;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: rgba(37, 133, 153, 0.1);
+}
+
+.page-titles {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.page-titles h1 {
+  color: #fff;
+  font-size: 38px;
+  font-weight: 800;
+  margin: 0;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h1 strong {
+  color: #facc15;
+}
+
+.page-titles p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.hero-card {
+  display: flex;
+  flex-direction: row;
+  min-height: 400px;
+}
+
+.hero-image-container {
+  flex: 1;
+  position: relative;
+}
+
+.hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-content {
+  flex: 1;
+  padding: 50px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tags-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.tag-highlight {
+  background: #ffdf00;
+  color: #4a2c20;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 50px;
+  text-transform: uppercase;
+}
+
+.date-text {
+  color: #123e47;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.hero-title {
+  color: #123e47;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 16px 0;
+}
+
+.hero-summary {
+  color: #123e47;
+  font-size: 16px;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin: 0 0 32px 0;
+}
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: auto;
+}
+
+.circle-btn {
+  background: #ffffff;
+  color: #258599;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.circle-btn:hover {
+  transform: scale(1.1);
+}
+
+.dots-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background: rgba(18, 62, 71, 0.25);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.active-dot {
+  background: #123e47;
+  width: 28px;
+  border-radius: 5px;
+}
+
+.section-divider {
+  margin: 60px 0 30px 0;
   text-align: center;
 }
 
+.section-divider h3 {
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+}
+
+.yellow-line {
+  width: 50px;
+  height: 4px;
+  background: #ffdf00;
+  border-radius: 4px;
+  margin: 0 auto;
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.mini-card {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.mini-card:hover {
+  transform: translateY(-8px);
+}
+
+.mini-card-img-wrapper {
+  width: 100%;
+  height: 200px;
+  position: relative;
+}
+
+.mini-card-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mini-card-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.small-date {
+  margin-bottom: 8px;
+}
+
+.mini-card-title {
+  color: #123e47;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 12px 0;
+}
+
+.mini-card-summary {
+  color: #123e47;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.9;
+  margin: 0;
+}
+
+@media (max-width: 850px) {
+  .hero-card {
+    flex-direction: column;
+  }
+
+  .hero-image-container {
+    height: 250px;
+    flex: none;
+  }
+
+  .hero-content {
+    padding: 30px 20px;
+  }
+}
+
+/* Pop up de notícias */
+
+.clickable {
+  cursor: pointer;
+}
+
+.btn-ler-materia {
+  align-self: flex-start;
+  margin-bottom: 25px;
+  padding: 10px 20px;
+  background: #facc15;
+  color: #123e47;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-ler-materia:hover {
+  transform: translateY(-2px);
+  background: #fde047;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 750px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(18, 62, 71, 0.1);
+  border: none;
+  color: #123e47;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: rgba(18, 62, 71, 0.2);
+}
+
+.modal-title {
+  color: #123e47;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.3;
+  margin: 10px 0 24px 0;
+}
+
+.modal-img-container img {
+  width: 100%;
+  max-height: 350px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+.modal-resumo {
+  font-weight: 700;
+  font-size: 16px;
+  color: #123e47;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.modal-texto {
+  color: #123e47;
+  font-size: 16px;
+  line-height: 1.7;
+  opacity: 0.9;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>
