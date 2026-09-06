@@ -6,7 +6,7 @@ Nesta etapa será definido o que fará parte da primeira versão do Reciclo, que
 
 **Usuário secundário (demais usuários do Campus IFB)**: também poderão utilizar a plataforma para consultar informações relacionadas ao descarte. As necessidades são semelhantes às dos estudantes, porém o desenvolvimento da linguagem e da experiência será direcionado prioritariamente ao público estudantil.
 
-**Usuário administrador**: responsável por cadastrar resíduos; editar informações; atualizar orientações de descarte; adicionar novas categorias e remover informações incorretas ou desatualizadas.
+**Usuário administrador**: responsável por cadastrar posts; editar informações; atualizar orientações de descarte; adicionar novas categorias e remover informações incorretas ou desatualizadas.
 
 #### Definição dos requisitos funcionais
 **RF01 — Visualizar tipos e categorias de resíduos:** o sistema deverá apresentar os principais tipos e classificações de resíduos abordados pelo projeto LixoZero.
@@ -44,12 +44,11 @@ estudantil.
 **A primeira versão deverá contemplar:**
 
 - landing page do Reciclo;
-- apresentação das categorias de resíduos;
+- apresentação dos projetos já realizados;
 - informações básicas sobre os resíduos;
 - destaque para resíduos orgânicos;
 - orientação sobre descarte correto;
 - pesquisa de resíduos;
-- filtros por categoria;
 - apresentação do projeto Reciclo e do Lixo Zero;
 - interface responsiva com prioridade para smartphones.
 
@@ -252,7 +251,7 @@ Inicialmente serão necessárias duas entidades principais.
 ```
 Categoria
 ---------
-id
+id (único)
 nome
 descricao
 ```
@@ -261,7 +260,7 @@ descricao
 ```
 Residuo
 -------
-id
+id (único)
 nome
 descricao
 descarte
