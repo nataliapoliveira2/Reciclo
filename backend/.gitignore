@@ -1,2 +1,21 @@
+# Dependências e compilação
 node_modules/
+dist/
+
+# Pastas de ferramentas e agentes AI geradas pelo Prisma
+.agents/
+.claude/
+.cursor/
+.devin/
+*.config.ts
+
+# Arquivos de banco de dados locais
+/prisma/*.db
+/prisma/*.db-journal
+
+# Uploads locais de teste
+/uploads/*
+!/uploads/.gitkeep
+
+# Variáveis de ambiente
 .env
