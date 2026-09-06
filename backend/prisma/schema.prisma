@@ -31,3 +31,20 @@ model Image {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
 }
+
+model Category {
+  id        Int     @id @default(autoincrement())
+  slug      String  @unique // ex: "organico", "plastico", "papel"
+  nome      String  // ex: "Orgânico", "Plástico", "Papel"
+  wastes    Waste[]
+}
+
+model Waste {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  descarte    String
+  categoryId  Int
+  categoria   Category @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
