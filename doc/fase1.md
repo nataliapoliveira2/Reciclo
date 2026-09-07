@@ -1,5 +1,5 @@
 ## 1. Concepção, Setup e Planejamento
-Nesta etapa será definido o que fará parte da primeira versão do Reciclo, quem utilizará a aplicação e quais funcionalidades serão necessárias para atender ao objetivo do projeto.
+Nesta etapa foi definido o que fará parte da primeira versão do Reciclo, quem utilizará a aplicação e quais funcionalidades serão necessárias para atender ao objetivo do projeto.
 
 #### Mapeamento dos usuários
 **Usuário principal (estudantes)**: pode descobrir rapidamente onde descartar determinado resíduo; compreender a classificação dos resíduos; acessar informações sem conhecimento técnico prévio; utilizar o sistema pelo celular e encontrar respostas de maneira rápida e visual.
@@ -41,17 +41,17 @@ estudantil.
 **RNF07 — Evolução:** a estrutura deverá permitir futuras integrações com a segunda frente do Reciclo.
 
 ### Definição do escopo inicial
-**A primeira versão deverá contemplar:**
+**A primeira versão contempla:**
 
-- landing page do Reciclo;
+- portal de notícias do Reciclo;
+- landing page de apresentação do conceito de Realidade Aumentada;
 - apresentação das categorias de resíduos;
 - informações básicas sobre os resíduos;
 - destaque para resíduos orgânicos;
 - orientação sobre descarte correto;
-- pesquisa de resíduos;
-- filtros por categoria;
 - apresentação do projeto Reciclo e do Lixo Zero;
-- interface responsiva com prioridade para smartphones.
+- interface responsiva com prioridade para smartphones;
+- API para cadastro de usuários e publicação de posts com imagens.
 
 **Não fazem parte desta primeira fase:**
 
@@ -59,10 +59,12 @@ estudantil.
 - realidade aumentada ou outros recursos imersivos;
 - ponto de coleta interativo;
 - autenticação de usuários;
-- painel administrativo completo.
+- painel administrativo completo;
+- pesquisa de resíduos por nome (planejado);
+- filtros por categoria (planejado).
 
 #### Backlog inicial
-O backlog inicial deverá transformar o escopo em atividades que posteriormente serão detalhadas e
+O backlog inicial transformou o escopo em atividades que foram detalhadas e
 distribuídas entre os integrantes:
 
 - levantar categorias de resíduos;
@@ -84,22 +86,24 @@ distribuídas entre os integrantes:
 ## 2. Design Técnico e Arquitetura
 
 ### 2.1 Prototipagem e Contratos
-Nesta etapa serão definidos os fluxos de comunicação entre os componentes da aplicação antes da
+Nesta etapa foram definidos os fluxos de comunicação entre os componentes da aplicação antes da
 implementação completa.
 
 #### Protótipo de integração
-Será criado um fluxo inicial demonstrando como o frontend solicitará uma informação ao backend.
+O fluxo demonstra como o frontend solicita uma informação ao backend.
 
 ```
 Usuário
  ↓
-Frontend
+Frontend (Vue.js 3 + Vite 8)
  ↓
 Requisição HTTP
  ↓
-API REST
+API REST (Express 4)
  ↓
-Backend
+Prisma Client
+ ↓
+SQLite (dev.db)
  ↓
 Resposta em JSON
  ↓
@@ -107,88 +111,148 @@ Frontend
  ↓
 Informação apresentada ao usuário
 ```
-**Exemplo:**
-
-O estudante pesquisa: `Casca de banana`
-
-O frontend realiza: `GET /api/v1/residuos?busca=banana`
-
-A API poderá retornar:
-```
-{
-    "success": true,
-        "data": [
-        {
-            "id": 1,
-            "nome": "Casca de banana",
-            "categoria": "Orgânico",
-            "descarte": "Coletor destinado aos resíduos orgânicos."
-        }
-    ]
-}
-```
-O frontend será responsável por transformar esses dados em uma apresentação simples para o
-usuário.
 
 #### Definição dos contratos da API
-Os contratos documentarão como frontend e backend deverão se comunicar.
 
-**Endpoints iniciais:**
+Os contratos documentam como frontend e backend se comunicam.
 
-**Listar categorias**
+**Endpoints implementados:**
 
-`GET /api/v1/categorias`
+**Criar usuário**
 
-**Listar resíduos**
+`POST /users`
 
-`GET /api/v1/residuos`
-
-**Consultar um resíduo**
-
-`GET /api/v1/residuos/:id`
-
-**Pesquisar resíduos**
-
-`GET /api/v1/residuos?busca=banana`
-
-**Filtrar por categoria**
-
-`GET /api/v1/residuos?categoria=organico`
-
-Para cada endpoint deverão ser documentados:
-
-- método HTTP;
-- endereço da rota;
-- parâmetros;
-- estrutura da requisição;
-- estrutura da resposta;
-- possíveis códigos HTTP;
-- formato dos erros.
-
-#### Padrão inicial das respostas
-
-Resposta de sucesso:
-```
+Corpo da requisição:
+```json
 {
-"success": true,
-"data": {}
+  "name": "Nome do Usuário",
+  "email": "email@exemplo.com"
 }
 ```
 
-Resposta de erro:
-```
+Resposta de sucesso (201):
+```json
 {
-"success": false,
-"message": "Resíduo não encontrado."
+  "id": "uuid",
+  "name": "Nome do Usuário",
+  "email": "email@exemplo.com",
+  "createdAt": "2025-12-05T00:00:00.000Z"
+}
+```
+
+Resposta de erro (400):
+```json
+{
+  "error": "Erro ao criar usuário ou e-mail já existente."
+}
+```
+
+---
+
+**Criar post com imagens**
+
+`POST /posts` (multipart/form-data)
+
+Campos:
+- `title` — título do post
+- `content` — conteúdo do post
+- `authorId` — ID do usuário autor
+- `images` — até 5 arquivos de imagem
+
+Resposta de sucesso (201):
+```json
+{
+  "id": "uuid",
+  "title": "Título",
+  "content": "Conteúdo",
+  "authorId": "uuid",
+  "createdAt": "2025-12-05T00:00:00.000Z",
+  "author": { "id": "uuid", "name": "Nome", "email": "email" },
+  "images": [
+    { "id": "uuid", "url": "/uploads/images-123456789.jpg", "postId": "uuid" }
+  ]
+}
+```
+
+Resposta de erro (400):
+```json
+{
+  "error": "Erro ao criar post com imagens."
+}
+```
+
+---
+
+**Listar posts**
+
+`GET /posts`
+
+Resposta de sucesso (200):
+```json
+[
+  {
+    "id": "uuid",
+    "title": "Título",
+    "content": "Conteúdo",
+    "authorId": "uuid",
+    "createdAt": "2025-12-05T00:00:00.000Z",
+    "author": { "id": "uuid", "name": "Nome", "email": "email" },
+    "images": []
+  }
+]
+```
+
+Os posts são retornados ordenados por data de criação (mais recentes primeiro).
+
+Resposta de erro (500):
+```json
+{
+  "error": "Erro ao buscar posts."
+}
+```
+
+---
+
+**Endpoint de verificação**
+
+`GET /` (definido no `app.js`, porém não utilizado pelo `server.js`)
+
+Resposta (200):
+```json
+{
+  "message": "API funcionando"
+}
+```
+
+---
+
+**Endpoints planejados (não implementados):**
+
+```
+GET /api/v1/categorias
+GET /api/v1/residuos
+GET /api/v1/residuos/:id
+GET /api/v1/residuos?busca=banana
+GET /api/v1/residuos?categoria=organico
+```
+
+#### Padrão das respostas
+
+Respostas de sucesso retornam o objeto ou array diretamente com código HTTP correspondente (200 ou 201).
+
+Respostas de erro utilizam a chave `error`:
+```json
+{
+  "error": "Mensagem descritiva do erro."
 }
 ```
 
 Principais códigos:
 
 ```
-200 — Sucesso
-400 — Requisição inválida
-404 — Recurso não encontrado
+200 — Sucesso (leitura)
+201 — Criado com sucesso
+400 — Requisição inválida ou dado duplicado
 500 — Erro interno do servidor
 ```
 
@@ -202,38 +266,87 @@ Principais códigos:
              ↓
 ┌──────────────────────────┐
 │ FRONTEND                 │
-│ Interface e interação    │
+│ Vue.js 3.5 + Vite 8      │
 └────────────┬─────────────┘
              │ HTTP / JSON
              ↓
 ┌──────────────────────────┐
 │ API REST                 │
-│ Comunicação da aplicação │
+│ Express 4.21             │
 └────────────┬─────────────┘
              ↓
 ┌──────────────────────────┐
 │ BACKEND                  │
-│ Regras e processamento   │
+│ Node.js (CommonJS)       │
+│ Multer (upload)          │
+│ Swagger (documentação)   │
 └────────────┬─────────────┘
              ↓
 ┌──────────────────────────┐
 │ PERSISTÊNCIA             │
-│ Banco de dados           │
+│ Prisma ORM + SQLite      │
 └──────────────────────────┘
 ```
 
-**Frontend:** Vue.js + Vite
+**Frontend:** Vue.js 3.5 + Vite 8 + Vue Router 4.6
 
-**Backend:** Node.js + Express
+**Backend:** Node.js + Express 4.21 (CommonJS)
+
+**ORM:** Prisma Client 5.22 + Prisma CLI 5.22
+
+**Upload de arquivos:** Multer 2.3
+
+**Documentação da API:** Swagger (swagger-autogen 2.23 + swagger-ui-express 5.0)
 
 **API REST:** HTTP + JSON
 
-**Camada de persistência:** PostgreSQL
-
+**Camada de persistência:** SQLite (arquivo local `dev.db`)
 
 #### Organização do Repositório (Estrutura Git)
 
-<!-- Nota: Acrescentar estrutura posteriormente.--->
+```
+reciclo/
+├── README.md
+├── doc/
+│   ├── fase1.md
+│   └── fase2.md
+├── img/
+│   └── mockup.jpg
+├── backend/
+│   ├── package.json
+│   ├── .gitignore
+│   ├── prisma/
+│   │   └── schema.prisma
+│   └── src/
+│       ├── server.js               # Ponto de entrada (Express + rotas + Prisma)
+│       └── app.js                  # Config Express alternativa (não utilizado)
+└── front/
+    ├── package.json
+    ├── index.html                  # HTML raiz (title: "Reciclo")
+    ├── vite.config.js
+    ├── jsconfig.json
+    └── src/
+        ├── main.js                 # Bootstrapping do Vue
+        ├── App.vue                 # Portal de Notícias (página principal)
+        ├── ApresentacaoApp.vue     # Landing page Realidade Aumentada
+        ├── assets/
+        │   ├── base.css
+        │   ├── main.css
+        │   └── logo.svg
+        ├── components/
+        │   ├── HelloWorld.vue      # Scaffold Vue (não utilizado)
+        │   ├── TheWelcome.vue      # Scaffold Vue (não utilizado)
+        │   └── WelcomeItem.vue     # Scaffold Vue (não utilizado)
+        └── public/
+            ├── LogoIFB.png         # Logo do IFB
+            ├── LogoILZB.png        # Logo do Instituto Lixo Zero Brasil
+            ├── ImgNoticia1.jpg     # Imagem notícia 1
+            ├── ImgNoticia2.jpeg    # Imagem notícia 2
+            ├── ImgNoticia3.jpeg    # Imagem notícia 3
+            ├── ImgNoticia4.jpg     # Imagem notícia 4
+            ├── ImgNoticia5.png     # Imagem notícia 5
+            └── favicon.ico
+```
 
 ---
 
@@ -241,153 +354,205 @@ Principais códigos:
 
 ### 3.1 Modelagem e Casos de Uso
 
-Nesta etapa os requisitos definidos anteriormente serão convertidos em estruturas técnicas que
-orientarão a implementação do backend.
+Nesta etapa os requisitos definidos anteriormente foram convertidos em estruturas técnicas que
+orientaram a implementação do backend.
 
 #### Modelagem do domínio
-Inicialmente serão necessárias duas entidades principais.
 
-**Categoria**
+O schema do banco de dados foi definido utilizando Prisma ORM com três entidades:
+
+**User**
 
 ```
-Categoria
+User
 ---------
-id
-nome
-descricao
+id          String   (UUID, chave primária)
+name        String
+email       String   (único)
+posts       Post[]   (relacionamento 1:N)
+createdAt   DateTime (padrão: now)
 ```
 
-**Resíduo**
+**Post**
+
 ```
-Residuo
--------
-id
-nome
-descricao
-descarte
-informacao_adicional
-imagem_url
-categoria_id
+Post
+---------
+id          String   (UUID, chave primária)
+title       String
+content     String
+author      User     (relacionamento N:1)
+authorId    String   (chave estrangeira)
+images      Image[]  (relacionamento 1:N)
+createdAt   DateTime (padrão: now)
 ```
 
-**Relacionamento:**
+**Image**
+
 ```
-CATEGORIA
-1
-│
-│
-N
-RESÍDUO
+Image
+---------
+id          String   (UUID, chave primária)
+url         String
+post        Post     (relacionamento N:1, cascade delete)
+postId      String   (chave estrangeira)
 ```
-Uma categoria poderá possuir vários resíduos.
+
+**Relacionamentos:**
+```
+USER
+ 1
+ │
+ N
+POST
+ 1
+ │
+ N
+IMAGE
+```
+
+Um usuário pode possuir vários posts. Um post pode possuir várias imagens. Ao excluir um post, suas imagens são removidas em cascata (`onDelete: Cascade`).
 
 Exemplo:
 ```
-Orgânico
- ├── Casca de banana
- ├── Casca de laranja
- ├── Borra de café
- └── Restos de alimentos
+Maria Clara
+ ├── Post: "IFB recebe Prêmio Lixo Zero 2025"
+ │    ├── Imagem: /uploads/images-123.jpg
+ │    └── Imagem: /uploads/images-456.jpg
+ └── Post: "Coleta de eletrônicos no Campus"
+      └── Imagem: /uploads/images-789.jpg
 ```
 
-#### Casos de uso técnicos
+#### Casos de uso técnicos implementados
 
-**UC01 — Listar categorias**
+**UC01 — Criar usuário**
 
-Objetivo: retornar as categorias cadastradas no sistema.
+Objetivo: cadastrar um novo usuário com nome e e-mail único.
 
-**UC02 — Listar resíduos**
+**UC02 — Criar post com imagens**
+
+Objetivo: publicar um novo post vinculado a um autor, com upload de até 5 imagens.
+
+**UC03 — Listar posts**
+
+Objetivo: retornar todos os posts com dados do autor e imagens, ordenados do mais recente para o mais antigo.
+
+#### Casos de uso técnicos planejados
+
+**UC04 — Listar categorias**
+
+Objetivo: retornar as categorias de resíduos cadastradas no sistema.
+
+**UC05 — Listar resíduos**
 
 Objetivo: retornar os resíduos disponíveis para consulta.
 
-**UC03 — Consultar resíduo**
+**UC06 — Consultar resíduo**
 
 Objetivo: recuperar todas as informações relacionadas a um resíduo específico.
 
-**UC04 — Pesquisar resíduo**
+**UC07 — Pesquisar resíduo**
 
 Objetivo: localizar resíduos utilizando o nome informado pelo usuário.
 
-**UC05 — Filtrar resíduos por categoria**
+**UC08 — Filtrar resíduos por categoria**
 
 Objetivo: retornar apenas resíduos pertencentes à categoria selecionada.
 
-
 #### Detalhamento no backlog
-Os casos de uso serão convertidos em tarefas técnicas.
 
-Exemplos:
-
-BK01 — Criar entidade Categoria
-
-BK02 — Criar entidade Resíduo
-
-BK03 — Implementar listagem de categorias
-
-BK04 — Implementar listagem de resíduos
-
-BK05 — Implementar consulta individual
-
-BK06 — Implementar pesquisa por nome
-
-BK07 — Implementar filtro por categoria
-
-BK08 — Implementar validações
-
-BK09 — Implementar tratamento de erros
-
-BK10 — Integrar API ao banco de dados
+| ID   | Tarefa                                       | Status         |
+|------|----------------------------------------------|----------------|
+| BK01 | Criar entidade User (Prisma)                 | ✅ Concluído    |
+| BK02 | Criar entidade Post (Prisma)                 | ✅ Concluído    |
+| BK03 | Criar entidade Image (Prisma)                | ✅ Concluído    |
+| BK04 | Implementar criação de usuário               | ✅ Concluído    |
+| BK05 | Implementar criação de post com imagens      | ✅ Concluído    |
+| BK06 | Implementar listagem de posts                | ✅ Concluído    |
+| BK07 | Implementar upload de imagens (Multer)       | ✅ Concluído    |
+| BK08 | Criar entidade Categoria                     | ⬜ Pendente     |
+| BK09 | Criar entidade Resíduo                       | ⬜ Pendente     |
+| BK10 | Implementar listagem de categorias           | ⬜ Pendente     |
+| BK11 | Implementar listagem de resíduos             | ⬜ Pendente     |
+| BK12 | Implementar consulta individual de resíduo   | ⬜ Pendente     |
+| BK13 | Implementar pesquisa por nome                | ⬜ Pendente     |
+| BK14 | Implementar filtro por categoria             | ⬜ Pendente     |
+| BK15 | Implementar validações                       | ⬜ Pendente     |
+| BK16 | Implementar tratamento padronizado de erros  | ⬜ Pendente     |
 
 ### 3.2 Implementação da API
-Nesta etapa serão desenvolvidos os componentes responsáveis pelo funcionamento do backend.
 
-#### Rotas
-As rotas serão responsáveis por direcionar as requisições recebidas.
+Nesta etapa foram desenvolvidos os componentes responsáveis pelo funcionamento do backend.
 
-Exemplos:
+#### Estrutura do backend
 
-```
-GET /api/v1/categorias
-GET /api/v1/residuos
-GET /api/v1/residuos/:id
-```
+A lógica da aplicação está concentrada no arquivo `server.js`, que acumula as responsabilidades de configuração, rotas, middlewares e acesso ao banco:
 
-#### Controllers
-Os controladores serão responsáveis por:
+```javascript
+// server.js — Estrutura geral
+const express = require('express');
+const cors = require('cors');
+const multer = require('multer');
+const path = require('path');
+const { PrismaClient } = require('@prisma/client');
 
-- receber as requisições;
-- acessar parâmetros;
-- chamar o serviço correspondente;
-- retornar a resposta HTTP.
+const app = express();
+const prisma = new PrismaClient();
 
-Estrutura:
+// Middlewares
+app.use(cors());
+app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-```
-CategoriaController
-ResiduoController
-```
-
-#### Services
-Os serviços concentrarão as regras da aplicação.
-
-Exemplos:
-
-```
-CategoriaService
-ResiduoService
+// Configuração do Multer (upload de imagens)
+// Rotas (POST /users, POST /posts, GET /posts)
+// Inicialização do servidor (porta 3000)
 ```
 
-Responsabilidades:
-- consultar registros;
-- pesquisar resíduos;
-- aplicar filtros;
-- verificar existência de registros;
-- coordenar operações necessárias para atender aos casos de uso.
+O arquivo `app.js` existe no projeto com uma configuração alternativa do Express (rota `GET /` de verificação), porém **não é importado nem utilizado** pelo `server.js`.
+
+#### Rotas implementadas
+
+```
+POST /users                → Criar usuário
+POST /posts                → Criar post com imagens (multipart/form-data)
+GET  /posts                → Listar posts com autor e imagens
+GET  /uploads/:filename    → Servir arquivos de imagem estáticos
+```
+
+#### Upload de imagens (Multer)
+
+O backend utiliza Multer com `diskStorage` para o upload de imagens:
+
+- **Destino:** diretório `uploads/` na raiz do backend
+- **Nomenclatura:** `{fieldname}-{timestamp}-{random}.{extensão}`
+- **Limite:** até 5 imagens por requisição
+- **Acesso:** servidos como arquivos estáticos em `/uploads/`
+
+Configuração:
+```javascript
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({ storage: storage });
+```
 
 #### Validação dos dados
-A API deverá validar as informações antes de realizar o processamento.
 
-Exemplos:
+A validação atual é mínima, tratada por:
+
+- restrição `@unique` no campo `email` do User (nível de banco);
+- tratamento de erros genéricos nos blocos `try/catch`.
+
+Validações planejadas:
 - verificar se o ID é válido;
 - validar parâmetros de pesquisa;
 - verificar parâmetros de filtros;
@@ -395,100 +560,177 @@ Exemplos:
 - impedir dados em formato incorreto.
 
 #### Tratamento de erros
-O backend deverá possuir tratamento padronizado de erros.
 
-Exemplo:
-```
+O backend utiliza blocos `try/catch` em cada rota, retornando respostas no formato:
+
+```json
 {
-"success": false,
-"message": "Resíduo não encontrado."
+  "error": "Mensagem descritiva do erro."
 }
 ```
-Também deverão ser tratados:
-- parâmetros inválidos;
-- registros inexistentes;
-- erros de conexão com banco;
-- erros internos da aplicação.
+
+Códigos HTTP utilizados:
+- `400` — erro de validação ou dado duplicado;
+- `500` — erro interno do servidor.
+
+Exemplos implementados:
+```json
+{ "error": "Erro ao criar usuário ou e-mail já existente." }
+{ "error": "Erro ao criar post com imagens." }
+{ "error": "Erro ao buscar posts." }
+```
+
+#### Dependências do backend
+
+| Pacote              | Versão       | Finalidade                          |
+|---------------------|--------------|-------------------------------------|
+| express             | ^4.21.1      | Framework HTTP                      |
+| cors                | ^2.8.5       | Habilitar Cross-Origin Requests     |
+| dotenv              | ^16.4.5      | Variáveis de ambiente (instalado, não utilizado) |
+| @prisma/client      | ^5.22.0      | Cliente ORM para banco de dados     |
+| multer              | ^2.3.0       | Upload de arquivos                  |
+| swagger-autogen     | ^2.23.7      | Geração automática de docs da API   |
+| swagger-ui-express  | ^5.0.1       | Interface visual do Swagger         |
+| nodemon (dev)       | ^3.1.7       | Hot-reload em desenvolvimento       |
+| prisma (dev)        | ^5.22.0      | CLI do Prisma (migrations etc.)     |
+
+#### Scripts disponíveis
+
+| Script               | Comando                          | Descrição                          |
+|----------------------|----------------------------------|------------------------------------|
+| `npm run dev`        | `nodemon src/server.js`          | Inicia com hot-reload              |
+| `npm start`          | `node src/server.js`             | Inicia em produção                 |
+| `npm run db:push`    | `prisma db push`                 | Sincroniza schema com o banco      |
+| `npm run db:migrate` | `prisma migrate dev --name init` | Cria migration de desenvolvimento  |
 
 ### 3.3 Persistência de Dados
-Nesta etapa será implementado o armazenamento das informações da aplicação.
+
+Nesta etapa foi implementado o armazenamento das informações da aplicação.
 
 #### Configuração do banco de dados
 
-Criar:
-- banco de dados;
-- tabelas;
-- campos;
-- tipos de dados;
-- chaves primárias;
-- chaves estrangeiras;
-- relacionamentos;
-- restrições necessárias.
+O banco de dados utiliza **SQLite** como provedor, gerenciado pelo **Prisma ORM**.
 
-Estrutura inicial:
+Schema (`prisma/schema.prisma`):
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  posts     Post[]
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  images    Image[]
+  createdAt DateTime @default(now())
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  url       String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+}
 ```
-CATEGORIA
-    │
-    │ 1:N
-    ↓
-RESÍDUO
+
+Estrutura de relacionamento:
+```
+USER
+  │
+  │ 1:N
+  ↓
+POST
+  │
+  │ 1:N
+  ↓
+IMAGE
 ```
 
 #### Integração backend e banco
 
-A aplicação deverá estabelecer conexão com o banco e executar as consultas através da camada de
-persistência.
+A aplicação utiliza o Prisma Client diretamente nas rotas, sem camadas intermediárias de controller, service ou repository.
 
-Exemplo:
+Fluxo atual:
 ```
-GET /api/v1/residuos
+POST /users
      ↓
-ResiduoController
+Rota Express (server.js)
      ↓
-ResiduoService
+prisma.user.create()
      ↓
-ResiduoRepository
+SQLite (dev.db)
      ↓
-PostgreSQL
+Usuário criado
+```
+
+```
+POST /posts
      ↓
-Lista de resíduos
+Rota Express (server.js) + Multer (upload)
+     ↓
+prisma.post.create({ include: { images, author } })
+     ↓
+SQLite (dev.db)
+     ↓
+Post criado com imagens
+```
+
+```
+GET /posts
+     ↓
+Rota Express (server.js)
+     ↓
+prisma.post.findMany({ include: { author, images }, orderBy: { createdAt: 'desc' } })
+     ↓
+SQLite (dev.db)
+     ↓
+Lista de posts
 ```
 
 #### Variáveis de ambiente
 
-Informações de configuração não deverão permanecer diretamente no código-fonte.
+O pacote `dotenv` está instalado como dependência, porém **não é importado** em nenhum arquivo do projeto. As configurações estão definidas diretamente no código:
 
-Exemplo:
+- **Porta do servidor:** `3000` (hardcoded no `server.js`)
+- **URL do banco:** `file:./dev.db` (hardcoded no `schema.prisma`)
+
+Configuração recomendada para o arquivo `.env`:
 ```
-NODE_ENV=
-PORT=
-DB_HOST=
-DB_PORT=
-DB_NAME=
-DB_USER=
-DB_PASSWORD=
-DATABASE_URL=
+DATABASE_URL="file:./dev.db"
+PORT=3000
+NODE_ENV=development
 ```
+
+O `.env` está incluído no `.gitignore` para não ser versionado.
 
 #### Ambiente de desenvolvimento
 
 Utilizado pela equipe durante a implementação e testes.
 
-Exemplo:
-`NODE_ENV=development
-`
-
-Poderá utilizar:
-- servidor local;
-- banco de dados local ou de desenvolvimento;
-- configurações específicas para testes.
+Utiliza:
+- servidor local (porta 3000);
+- banco de dados SQLite local (`prisma/dev.db`);
+- hot-reload com nodemon (`npm run dev`);
+- upload de imagens em diretório local (`uploads/`).
 
 #### Ambiente de produção
 
 Utilizado quando a aplicação estiver publicada.
-
-Exemplo:
-`NODE_ENV=production`
 
 Deverá utilizar:
 - banco de produção;
@@ -497,3 +739,132 @@ Deverá utilizar:
 - variáveis de ambiente protegidas.
 
 As credenciais não deverão ser armazenadas diretamente no repositório.
+
+---
+
+## 4. Desenvolvimento do Frontend
+
+### 4.1 Tecnologias e Configuração
+
+O frontend foi estruturado com Vue.js 3 e Vite.
+
+**Dependências:**
+
+| Pacote                   | Versão     | Finalidade                       |
+|--------------------------|------------|----------------------------------|
+| vue                      | ^3.5.40    | Framework reativo                |
+| vue-router               | ^4.6.4     | Roteamento SPA (instalado, não configurado) |
+| vite                     | ^8.1.5     | Build tool e dev server          |
+| @vitejs/plugin-vue       | ^6.0.8     | Suporte a SFCs no Vite           |
+| vite-plugin-vue-devtools | ^8.1.5     | DevTools para desenvolvimento    |
+
+**Requisito de runtime:** Node.js ^22.18.0 ou >=24.12.0
+
+**Scripts disponíveis:**
+
+| Script            | Comando          | Descrição              |
+|-------------------|------------------|------------------------|
+| `npm run dev`     | `vite`           | Inicia dev server      |
+| `npm run build`   | `vite build`     | Build de produção      |
+| `npm run preview` | `vite preview`   | Preview do build       |
+
+**Ponto de entrada:** `main.js` inicializa o Vue e monta o componente `App.vue` no elemento `#app`.
+
+O `vue-router` está instalado como dependência, porém não está configurado no `main.js`. A aplicação renderiza diretamente o componente `App.vue`.
+
+### 4.2 Portal de Notícias (App.vue)
+
+O componente principal (`App.vue`, 713 linhas) implementa um **Portal de Notícias** do Reciclo com o seguinte conteúdo:
+
+**Header:**
+- Logos do IFB e do Instituto Lixo Zero Brasil (imagens em `public/`)
+- Menu hamburger com dropdown contendo link de Login
+
+**Carrossel de destaques:**
+- Exibe as 3 notícias mais recentes
+- Navegação com botões ❮/❯ e indicadores circulares clicáveis
+- Imagem de capa em destaque
+- Tag "DESTAQUE", data formatada (dd/mm/aaaa), título, resumo
+- Botão "Ler Matéria Completa"
+
+**Grade de notícias:**
+- Grid responsivo (`auto-fit`, mínimo 300px por card)
+- Cards com imagem, data, título e resumo
+- Hover com efeito de elevação (`translateY(-8px)`)
+- Clicável — abre modal de leitura
+
+**Modal de leitura:**
+- Popup glassmorphism com overlay blur
+- Exibe data, título, imagem, resumo em negrito e conteúdo completo
+- Botão de fechar (✕)
+
+**Dados das notícias (hardcoded):**
+
+O componente contém 5 notícias estáticas com conteúdo real do projeto Lixo Zero:
+
+| ID | Título | Data |
+|----|--------|------|
+| 1  | IFB Campus Brasília recebe destaque no Prêmio Lixo Zero 2025 | 05/12/2025 |
+| 2  | IFB recebe Encontro Nacional de Boas Práticas Lixo Zero nesta semana | 03/12/2025 |
+| 3  | Campus Brasília avança rumo ao lixo zero e seleciona cooperativas | 06/06/2025 |
+| 4  | Coleta de resíduos eletrônicos no IFB Campus Brasília | 01/08/2024 |
+| 5  | Encontro Nacional de Boas Práticas Lixo Zero começa dia 3 | sem data |
+
+**Lógica reativa (`<script setup>`):**
+- `menuAberto` — controle do dropdown do menu
+- `slideAtivo` — índice do slide do carrossel
+- `noticiaAberta` — notícia exibida no modal (bloqueia scroll do body)
+- `noticiasOrdenadas` — computed que ordena por data decrescente
+- `noticiasDestaque` — computed que seleciona as 3 mais recentes
+- `formatarData()` — converte ISO (yyyy-mm-dd) para formato brasileiro (dd/mm/aaaa)
+
+**Características visuais:**
+- Fonte: Inter (Google Fonts)
+- Layout: full-width responsivo (max-width: 1100px)
+- Gradiente de fundo: tons de verde/azul (#258599 → #86c596)
+- Cards glassmorphism (backdrop-filter: blur)
+- Breakpoint em 850px (carrossel empilha verticalmente)
+- Título: "Portal de Notícias **RECICLO**" (RECICLO em amarelo #facc15)
+
+### 4.3 Landing Page de Realidade Aumentada (ApresentacaoApp.vue)
+
+O componente `ApresentacaoApp.vue` (402 linhas) contém a landing page de apresentação do conceito de Realidade Aumentada do Reciclo. Este componente **não está integrado à navegação** da aplicação (não é roteado nem importado pelo `App.vue`).
+
+**Conteúdo:**
+- Header com título "Reciclo" e subtítulo "Realidade Aumentada"
+- Card introdutório com descrição do projeto e integração com o Lixo Zero
+- Seção "Mecânica Principal" com 4 cards explicativos:
+  1. Scan & Spawn — escaneamento com RA
+  2. Indicação da Lixeira — coleta seletiva em RA
+  3. Pontos de Coleta (Ecopontos)
+  4. Confirmação do Descarte
+- Seção "Tipos de Resíduos" com lista estática:
+  - Papel (cor azul)
+  - Reciclável Seco (cor vermelha)
+  - Orgânico / Úmido (cor marrom, com destaque "Foco Lixo Zero / Compostagem")
+- CTA "Baixar Reciclo" e texto "Disponível para iOS e Android"
+
+**Características visuais:**
+- Fonte: Poppins (Google Fonts)
+- Layout: full-width (sem frame mobile)
+- Background do body: #258599
+- Ícones SVG inline
+- Cards translúcidos com backdrop-filter
+
+### 4.4 Assets
+
+**Diretório `public/`:**
+- `LogoIFB.png` — logo institucional do IFB
+- `LogoILZB.png` — logo do Instituto Lixo Zero Brasil
+- `ImgNoticia1.jpg` a `ImgNoticia5.png` — fotografias das notícias
+- `favicon.ico`
+
+**Diretório `assets/`:**
+- `base.css` — estilos base
+- `main.css` — estilos globais
+- `logo.svg` — logo do Vue (scaffold, não utilizado)
+
+**Componentes de scaffold (não utilizados):**
+- `components/HelloWorld.vue`
+- `components/TheWelcome.vue`
+- `components/WelcomeItem.vue`
