@@ -83,7 +83,84 @@ app.get('/posts', async (req, res) => {
   }
 });
 
+// Rotas da API v1
+
+app.get('/api/v1/categorias', async (req, res) => {
+  try {
+    const categorias = await prisma.category.findMany();
+    return res.json({
+      success: true,
+      data: categorias
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: 'Erro ao buscar categorias.' });
+  }
+});
+
+app.get('/api/v1/residuos', async(req, res) => {
+  try {
+    const { busca, categoria } = req.query;
+
+    const where = {};
+
+    if (busca) {
+      where.nome = { contains: String(busca) };
+    }
+
+    if (categoria) {
+      where.categoria = {
+        slug: String(categoria)
+      };
+    }
+
+    const residuos = await prisma.waste.findMany({
+      where,
+      include: {
+        categoria: {
+          select: { id: true, nome: true, slug: true }
+        }
+      }
+    });
+
+    return res.json({
+      success: true,
+      data: residuos
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: 'Erro ao buscar resíduos.' });
+  }
+});
+
+app.get('/api/v1/residuos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const residuo = await prisma.waste.findUnique({
+      where: { id: Number(id) },
+      include: {
+        categoria: {
+          select: { id: true, nome: true, slug: true }
+        }
+      }
+    });
+
+    if (!residuo) {
+      return res.status(404).json({
+        success: false,
+        error: 'Resíduo não encontrado.'
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: residuo
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: 'Erro ao buscar o resíduo.' });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

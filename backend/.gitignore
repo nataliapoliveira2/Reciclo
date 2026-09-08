@@ -1,6 +1,7 @@
 # Dependências e compilação
 node_modules/
 dist/
+package-lock.json
 
 # Pastas de ferramentas e agentes AI geradas pelo Prisma
 .agents/
